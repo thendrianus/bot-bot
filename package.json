@@ -1,0 +1,29 @@
+{
+  "name": "the-bot-bot",
+  "version": "1.0.0",
+  "description": "Get started chatbot example",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "lint": "jshint --exclude node_modules .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thendrianus/the-bot-bot.git"
+  },
+  "author": "thendrianus",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "config": "^1.20.4",
+    "ejs": "^2.4.2",
+    "express": "^4.13.4",
+    "express-myconnection": "^1.0.4",
+    "mysql": "^2.15.0",
+    "request": "^2.72.0",
+    "socket.io": "^2.0.4"
+  },
+  "engines": {
+    "node": "~4.1.2"
+  }
+}

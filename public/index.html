@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>The Bot Bot</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+
+  <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+
+  <div class="container clearfix">
+    <div class="people-list" id="people-list">
+      <ul class="list" id="listConversation">
+
+      </ul>
+    </div>
+
+    <div class="chat">
+      <div class="chat-header clearfix">
+        <img src="https://cdn2.iconfinder.com/data/icons/ios-7-icons/50/user_male2-512.png" alt="avatar"
+          id="currentUserPicture" style="width: 57px; border-radius: 50%;" />
+
+        <div class="chat-about">
+          <div class="chat-with" id="currentUserName"></div>
+          <a class="chat-num-messages" href="https://www.facebook.com/The-Bot-Bot-145842262876101/"
+            target="_blank">Facebook Page The Bot Bot</a>
+        </div>
+        <i class="fa fa-star"></i>
+      </div>
+
+      <div class="chat-history">
+        <ul id="chat">
+
+        </ul>
+
+      </div>
+
+      <div class="chat-message clearfix">
+        <form id="messageForm">
+          <textarea name="message-to-send" id="message-to-send" placeholder="Type your message" rows="3"></textarea>
+          <button type="submit" value="Send Message">Send</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js'></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js'></script>
+  <script>
+
+    var socket = io.connect();
+    var $messageForm = $('#messageForm');
+    var $message = $('#message-to-send');
+    var $chat = $('#chat');
+    var $currentUserID = '';
+    var listConversation = [];
+    var $listConversations = $('#listConversation');
+    var $currentUserName = $('#currentUserName');
+    var currentUserName = "";
+    var $currentUserPicture = $('#currentUserPicture');
+
+    $messageForm.submit(function (e) {
+      e.preventDefault();
+      if ($currentUserID != '') {
+        socket.emit('send message', { message: $message.val(), user_id: $currentUserID });
+        $message.val('');
+      } else {
+        alert('Select the user first!!!');
+      }
+
+    });
+
+    socket.on('new message', function (data) {
+      console.log(data);
+      if ($currentUserID == data.sender) {
+        appendFromCb(data);
+      }
+    });
+
+    socket.on('message sent', function (data) {
+      console.log(data);
+      appendFromFb(data);
+    });
+
+    function appendFromFb(data) {
+      $chat.append('<li class="clearfix"> <div class="message-data align-right"> <span class="message-data-name">The Bot Bot</span> <i class="fa fa-circle me"></i></div> <div class="message other-message float-right"> ' + data.message + ' </div> </li>');
+    }
+
+    function appendFromCb(data) {
+      $chat.append('<li> <div class="message-data"> <span class="message-data-name"> <i class="fa fa-circle online"></i> ' + currentUserName + '</span>  </div> <div class="message my-message"> ' + data.message + ' </div> </li>');
+    }
+
+    socket.on('list message', function (data) {
+      console.log(data);
+      listConversation = data;
+      $listConversations.empty();
+      for (let i = 0; i < data.length; i++) {
+        $listConversations.append('<li class="clearfix" onClick="selectuser(\'' + data[i].user_id + '\')"> <img src="' + data[i].profile_picture + '" alt="avatar" style="width: 57px; border-radius: 50%;" /> <div class="about"> <div class="name">' + data[i].firstname + ' ' + data[i].lastname + '</div> <div class="status"> <i class="fa fa-circle offline"></i> ' + data[i].last + ' </div> </div> </li>');
+      }
+
+    });
+
+    var conversationsParse = [];
+    function selectuser(user_id) {
+      console.log(user_id);
+      for (let i = 0; i < listConversation.length; i++) {
+        if (listConversation[i].user_id == user_id) {
+          $currentUserName.html("Chat with " + listConversation[i].firstname + " " + listConversation[i].lastname);
+          currentUserName = listConversation[i].firstname + " " + listConversation[i].lastname;
+          $currentUserPicture.attr("src", listConversation[i].profile_picture);
+          $currentUserID = user_id;
+
+          conversationsParse = [];
+
+          try {
+            conversationsParse = JSON.parse(listConversation[i].conversations);
+          }
+          catch (err) {
+            alert('Error happend!!!')
+          }
+          $chat.empty();
+          for (let j = 0; j < conversationsParse.length; j++) {
+            if (conversationsParse[j].from != 'fb') {
+              appendFromFb(conversationsParse[j]);
+            } else {
+              appendFromCb(conversationsParse[j]);
+            }
+          }
+
+        }
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
