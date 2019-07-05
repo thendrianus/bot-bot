@@ -7,4 +7,4 @@ the project is very simple where people chatting with a Facebook page and all th
 Here's how the project looks like
 
 ![Image of Chat Portal](https://github.com/thendrianus/bot-bot/blob/master/public/1.PNG?raw=true)
-![Image of Messanger](https://github.com/thendrianus/bot-bot/blob/master/public/2.PNG?raw=true)
+![Image of Messanger](https://github.com/thendrianus/bot-bot/blob/master/public/2.jpeg?raw=true)
